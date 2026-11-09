@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from tests.config import BASE_URL, CLIENT_EMAIL, CLIENT_PASSWORD, ORGA_EMAIL, ORGA_PASSWORD
 from selenium.webdriver.common.by import By
+from tests.pages.login_page import LoginPage
 import pytest
 import time
 
@@ -16,31 +17,41 @@ TITRE = (By.CSS_SELECTOR, "h1.page-title")
 DECONNEXION = (By.XPATH, "//button[normalize-space()='Deconnexion']")
 
 
+# ANCIENNE VERSION UN PEU NULLE
+# def test_incorrect_login(driver):
+#     driver.get(f"{BASE_URL}/login")
+#     wait = WebDriverWait(driver, 10)
+
+#     # Trouver et completer email
+#     email_input = wait.until(EC.visibility_of_element_located(EMAIL_INPUT))
+#     email_input.clear()
+#     email_input.send_keys("hzjhkrzty@aefaef")
+
+#     # Trouver et completer mdp
+#     password_input = driver.find_element(*PASSWORD_INPUT)
+#     password_input.clear()
+#     password_input.send_keys("aefaef")
+
+#     login_btn = driver.find_element(*LOGIN_BTN)
+#     login_btn.click()
+
+#     # Pour voir execution
+#     # time.sleep(5)
+
+#     # BAM erreur corrigée!
+#     error_msg = wait.until(EC.visibility_of_element_located(ERROR))
+
+#     assert error_msg.text == "Incorrect email or password"
+#     assert driver.current_url == f"{BASE_URL}/login"
+
+
 def test_incorrect_login(driver):
-    driver.get(f"{BASE_URL}/login")
-    wait = WebDriverWait(driver, 10)
+    login_page = LoginPage(driver)
+    message_erreur = login_page.ouvrir().soumettre("wrong@test.be", "testfaux").message_erreur()
+    assert message_erreur == "Incorrect email or password"
+    assert login_page.driver.current_url == f"{BASE_URL}/login"
 
-    # Trouver et completer email
-    email_input = wait.until(EC.visibility_of_element_located(EMAIL_INPUT))
-    email_input.clear()
-    email_input.send_keys("hzjhkrzty@aefaef")
 
-    # Trouver et completer mdp
-    password_input = driver.find_element(*PASSWORD_INPUT)
-    password_input.clear()
-    password_input.send_keys("aefaef")
-
-    login_btn = driver.find_element(*LOGIN_BTN)
-    login_btn.click()
-
-    # Pour voir execution
-    # time.sleep(5)
-
-    # BAM erreur corrigée!
-    error_msg = wait.until(EC.visibility_of_element_located(ERROR))
-
-    assert error_msg.text == "Incorrect email or password"
-    assert driver.current_url == f"{BASE_URL}/login"
 
 def test_vraie_suppression_state_react_bizzare(driver):
     driver.get(f"{BASE_URL}/login")

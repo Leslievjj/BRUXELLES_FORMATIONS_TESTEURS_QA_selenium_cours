@@ -54,13 +54,10 @@ class LoginPage:
         return self.trouver(self.ERREUR).text
         
 
+# Ne lance pas les focntions si on import seulement login page
+if __name__ == "__main__":
+    my_driver = webdriver.chrome()
 
-    
-
-
-
-my_driver = webdriver.chrome()
-
-page = LoginPage(my_driver)
-page.ouvrir().saisir(page.EMAIL, 'orga@eventflow.com')
-page.saisir(page.EMAIL, 'orga@eventflow.com')
+    page = LoginPage(my_driver)
+    page.ouvrir().saisir(page.EMAIL, 'orga@eventflow.com')
+    page.saisir(page.EMAIL, 'orga@eventflow.com')
