@@ -76,55 +76,74 @@ def test_vraie_suppression_state_react_bizzare(driver):
     assert email_input.get_property("value") == "123456"
     assert password_input.get_property("value") == ""
 
+# Ancienne version
+# def test_orga_succes_login(driver):
+#     driver.get(f"{BASE_URL}/login")
+#     wait = WebDriverWait(driver, 10)
+
+#     email = wait.until(EC.visibility_of_element_located(EMAIL_INPUT))
+#     # assert email
+#     email.clear()
+#     email.send_keys(ORGA_EMAIL)
+
+#     password = driver.find_element(*PASSWORD_INPUT)
+#     # assert password
+#     password.clear()
+#     password.send_keys(ORGA_PASSWORD)
+
+#     btn_login = driver.find_element(*LOGIN_BTN)
+#     btn_login.click()
+
+#     wait.until(EC.url_changes(f"{BASE_URL}/login"))
+
+#     link = wait.until(EC.element_to_be_clickable(BACK_OFFICE_LINK))
+
+#     link.click()
+
+#     wait.until(EC.url_contains('/admin'))
+
+#     titre = wait.until(EC.visibility_of_element_located(TITRE))
+
+#     assert titre.text == "Back-office"
+
+# ANCIENNE version
+# def test_client_no_possible(driver):
+#     driver.get(f"{BASE_URL}/login")
+#     wait = WebDriverWait(driver, 5)
+
+#     input_email = wait.until(EC.visibility_of_element_located(EMAIL_INPUT))
+#     input_email.clear()
+#     input_email.send_keys(CLIENT_EMAIL)
+
+#     input_password = wait.until(EC.visibility_of_element_located(PASSWORD_INPUT))
+#     input_password.clear()
+#     input_password.send_keys(CLIENT_PASSWORD)
+
+#     btn_login = driver.find_element(*LOGIN_BTN)
+#     btn_login.click()
+
+#     wait.until(EC.url_changes(f"{BASE_URL}/login"))
+#     wait.until(EC.visibility_of_element_located(DECONNEXION))
+
+#     driver.get(f"{BASE_URL}/admin")
+#     wait.until(lambda d: not d.current_url.endswith('/admin'))
+
+#     assert driver.current_url == f"{BASE_URL}/"
+#     assert driver.find_elements(*BACK_OFFICE_LINK) == []
+
 def test_orga_succes_login(driver):
-    driver.get(f"{BASE_URL}/login")
-    wait = WebDriverWait(driver, 10)
-
-    email = wait.until(EC.visibility_of_element_located(EMAIL_INPUT))
-    # assert email
-    email.clear()
-    email.send_keys(ORGA_EMAIL)
-
-    password = driver.find_element(*PASSWORD_INPUT)
-    # assert password
-    password.clear()
-    password.send_keys(ORGA_PASSWORD)
-
-    btn_login = driver.find_element(*LOGIN_BTN)
-    btn_login.click()
-
-    wait.until(EC.url_changes(f"{BASE_URL}/login"))
-
-    link = wait.until(EC.element_to_be_clickable(BACK_OFFICE_LINK))
-
-    link.click()
-
-    wait.until(EC.url_contains('/admin'))
-
-    titre = wait.until(EC.visibility_of_element_located(TITRE))
-
-    assert titre.text == "Back-office"
+    login_page = LoginPage(driver)
+    login_page.ouvrir().se_connecter(ORGA_EMAIL,ORGA_PASSWORD)
+    login_page.aller_au_back_office()
+    assert login_page.titre()== "Back-office"
 
 def test_client_no_possible(driver):
-    driver.get(f"{BASE_URL}/login")
-    wait = WebDriverWait(driver, 5)
+    login_page = LoginPage(driver)
+    login_page.ouvrir().se_connecter(CLIENT_EMAIL, CLIENT_PASSWORD)
 
-    input_email = wait.until(EC.visibility_of_element_located(EMAIL_INPUT))
-    input_email.clear()
-    input_email.send_keys(CLIENT_EMAIL)
+    login_page.driver.get(f"{BASE_URL}/admin")
+    login_page.attendre(lambda drv: not drv.current_url.endswith(f"/admin"))
 
-    input_password = wait.until(EC.visibility_of_element_located(PASSWORD_INPUT))
-    input_password.clear()
-    input_password.send_keys(CLIENT_PASSWORD)
-
-    btn_login = driver.find_element(*LOGIN_BTN)
-    btn_login.click()
-
-    wait.until(EC.url_changes(f"{BASE_URL}/login"))
-    wait.until(EC.visibility_of_element_located(DECONNEXION))
-
-    driver.get(f"{BASE_URL}/admin")
-    wait.until(lambda d: not d.current_url.endswith('/admin'))
-
-    assert driver.current_url == f"{BASE_URL}/"
-    assert driver.find_elements(*BACK_OFFICE_LINK) == []
+    assert login_page.driver.current_url == f"{BASE_URL}/"
+    assert login_page.titre() != "Back-office"
+    assert not login_page.a_le_lien_back_office()
