@@ -1,42 +1,19 @@
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
+from tests.config import BASE_URL
+from tests.pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from tests.config import BASE_URL
-from selenium.webdriver import Keys
 
-class LoginPage:
+class LoginPage(BasePage):
     EMAIL = (By.CSS_SELECTOR, "input[type=email]")
     PASSWORD = (By.CSS_SELECTOR, "input[type=password]")
     SUBMIT = (By.CSS_SELECTOR, "form .btn-primary")
     ERREUR = (By.CSS_SELECTOR, ".notice-err")
-    DECONNEXION = (By.XPATH, "//button[normalize-space()='Deconnexion']")
-
-    # Constructeur, executé à la création d'une instance de 'LoginPage'
-    def __init__(self, driver: "webdriver.Chrome"):
-        self.driver = driver
-        self.wait = WebDriverWait(driver, 6)
 
     def ouvrir(self):
         self.driver.get(BASE_URL + "/login")
         self.wait.until(EC.visibility_of_element_located(self.EMAIL))
         return self
-
-    def saisir(self, locator: tuple[str, str], text: str):
-        champ = self.wait.until(EC.visibility_of_element_located(locator))
-        champ.clear()
-        champ.send_keys(Keys.CONTROL, "a")
-        champ.send_keys(Keys.DELETE)
-        champ.send_keys(text)
-        return self
-
-    def cliquer(self, locator: tuple[str, str]):
-        # attend qu'un élément soit cliquable et clique
-        return self.wait.until(EC.element_to_be_clickable(locator)).click()
-
-    def trouver(self, locator: tuple[str, str]):
-        # attend qu'un élément soit visible et le renvoie
-        return self.wait.until(EC.visibility_of_element_located(locator))
 
     def soumettre(self, email: str, password: str):
         self.saisir(self.EMAIL, email)
